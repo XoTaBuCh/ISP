@@ -46,16 +46,20 @@ def get_ngrams(words_dict: dict[str, int], n: int) -> dict[str, int]:
 
 def input_data() -> tuple[int, int]:
     n: int = input("Input N: ")
-    if n == "":
+    if n.isdigit():
+        n = int(n)
+    else:
         n = 4
     k: int = input("Input K: ")
-    if k == "":
+    if k.isdigit():
+        k = int(k)
+    else:
         k = 10
     return n, k
 
 
 def output_data(words_dict: dict[str, int], average_amount: float, median_amount: float,
-                sorted_ngrams: list[str], ngrams: dict[str, int], k: int):
+                sorted_ngrams: list[str], k: int):
     print("Words dictionary:")
     for word, amount in words_dict.items():
         print(f"{word} = {amount}")
@@ -64,6 +68,8 @@ def output_data(words_dict: dict[str, int], average_amount: float, median_amount
     print("Top k  ngrams:")
     for index in range(len(sorted_ngrams) - 1, len(sorted_ngrams) - k - 1, -1):
         print(f" {sorted_ngrams[index][0]} = {sorted_ngrams[index][1]}")
+        if index == 0:
+            break
 
 
 def main():
@@ -76,7 +82,7 @@ def main():
     average_amount, median_amount = get_sentences_words(text)
     ngrams = get_ngrams(words_dict, n)
     sorted_ngrams = sorted(ngrams.items(), key=lambda x: x[1])
-    output_data(words_dict, average_amount, median_amount, sorted_ngrams, ngrams, k)
+    output_data(words_dict, average_amount, median_amount, sorted_ngrams, k)
 
 
 if __name__ == "__main__":
