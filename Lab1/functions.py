@@ -75,7 +75,7 @@ def input_data() -> tuple[int, int]:
     else:
         n = constants.N_CONST
 
-    k: int = input("Input K: ")
+    k = input("Input K: ")
     if k.isdigit():
         k = int(k)
     else:
