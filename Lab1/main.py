@@ -1,25 +1,19 @@
-import re
-
-
-def input_file(filename: str) -> str:
-    text = open(filename, "r").read()
-    return text
-
-
-def text_analytics(text: str):
-    text.lower()
-    pass
+import functions
 
 
 def main():
-    n = input("Input N: ")
-    if n == "":
-        n = 4
-    k = input("Input K: ")
-    if k == "":
-        k = 10
-    text = input_file("input.txt")
-    print("Text:\n", text, sep = '')
+    text = functions.input_file("input.txt")
+    n, k = functions.input_data()
+    print("Text:\n", text, sep='')
+
+    text = text.lower()
+    words = functions.get_words(text)
+    words_dict = functions.get_words_count(words)
+    average_amount, median_amount = functions.get_sentences_words(text)
+    ngrams = functions.get_ngrams(words_dict, n)
+    sorted_ngrams = sorted(ngrams.items(), key=lambda x: x[1])
+
+    functions.output_data(words_dict, average_amount, median_amount, sorted_ngrams, k)
 
 
 if __name__ == "__main__":
