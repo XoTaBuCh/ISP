@@ -18,6 +18,7 @@ def print_hi(name):
 if __name__ == '__main__':
     d = {5 : 5, 6 : "dfd", "sf" : 45.3}
     s = Serializer()
-    print(s.serialize(print_hi))
+
+    #print(s.serialize(Aboba))
 
 
