@@ -26,7 +26,7 @@ class Serializer:
                 result = self.serialize_it(obj)
             elif inspect.isfunction(obj) or inspect.ismethod(obj) or isinstance(obj, staticmethod):
                 result = self.serialize_function(obj)
-            elif inspect.ismodule(obj) or inspect.isbuiltin(obj) or inspect.iscode():
+            elif inspect.ismodule(obj) or inspect.isbuiltin(obj) or inspect.iscode(obj):
                 result = self.serialize_instance(obj)
             elif hasattr(obj, "__dict__"):
                 result = self.serialize_object(obj)
@@ -36,9 +36,19 @@ class Serializer:
 
         return fd
 
-    def deserialize(self, obj):
+    def deserialize(self, obj: dict):
+        obj_type_string = obj[TYPE_FIELD]
 
-        pass
+        result = object
+
+        if obj_type_string == DICTIONARY_NAME:
+            result = self.deserialize_dict(obj)
+        elif obj_type_string in TYPES_NAMES:
+            result = self.deserialize_types(obj)
+        elif obj_type_string == FUNCTION_NAME:
+            result = self.deserialize_function(obj)
+
+        return result
 
     def serialize_dict(self, obj: dict):
         result = {VALUE_FIELD: {}}
@@ -50,8 +60,28 @@ class Serializer:
 
         return result
 
+    def deserialize_dict(self, obj: dict):
+        result = {}
+
+        for key, value in obj[VALUE_FIELD].items():
+            result_key = self.deserialize(key)
+            result_value = self.deserialize(value)
+            result[result_key] = result_value
+
+        return result
+
     def serialize_types(self, obj):
         result = {VALUE_FIELD: obj}
+
+        return result
+
+    def deserialize_types(self, obj):
+        result = object
+
+        if obj[TYPE_FIELD] == TYPES_NAMES[3]:
+            result = (obj[VALUE_FIELD] == "True")
+        else:
+            result = obj[VALUE_FIELD]
 
         return result
 
@@ -60,6 +90,22 @@ class Serializer:
 
         for value in obj:
             result[VALUE_FIELD].append(self.serialize(value))
+
+        return result
+
+    def deserialize_it(self, obj):
+        result = []
+
+        for value in obj[VALUE_FIELD]:
+            result_value = self.deserialize(value)
+            result.append(result_value)
+
+        if obj[TYPE_FIELD] == ITERABLE_NAMES[0]:
+            result = result
+        elif obj[TYPE_FIELD] == ITERABLE_NAMES[1]:
+            result = tuple(result)
+        elif obj[TYPE_FIELD] == ITERABLE_NAMES[2]:
+            result = bytes(result)
 
         return result
 
@@ -94,6 +140,15 @@ class Serializer:
 
         return result
 
+    def deserialize_function(self, obj):
+        result = object
+
+        for key, value in obj.items():
+            result_key = self.deserialize(key)
+            result_value = self.deserialize(value)
+
+        return result
+
     def serialize_class(self, obj):
         result = {VALUE_FIELD: {}}
         result[VALUE_FIELD][self.serialize(NAME_FIELD)] = self.serialize(obj.__name__)
@@ -110,6 +165,9 @@ class Serializer:
 
         return result
 
+    def deserialize_class(self, obj):
+        pass
+
     def serialize_instance(self, obj):
         result = {VALUE_FIELD: {}}
         members = []
@@ -125,6 +183,9 @@ class Serializer:
 
         return result
 
+    def deserialize_instance(self, obj):
+        pass
+
     def serialize_object(self, obj):
         result = {VALUE_FIELD: {}}
         for attribute in dir(obj):
@@ -134,3 +195,6 @@ class Serializer:
                 result[VALUE_FIELD][result_attribute] = result_value
 
         return result
+
+    def deserialize_object(self, obj):
+        pass

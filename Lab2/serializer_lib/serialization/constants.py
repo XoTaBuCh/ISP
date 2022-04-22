@@ -1,9 +1,24 @@
 
 OBJECT_TYPE = "\'([\w\W]+)\'"
-TYPE_FIELD = "type"
-VALUE_FIELD = "value"
+TYPE_FIELD = "TYPE"
+VALUE_FIELD = "VALUE"
+
 CLASS_NAME = "class"
 OBJECT_NAME = "object"
+DICTIONARY_NAME = "dict"
+FUNCTION_NAME = "function"
+TYPES_NAMES = [
+    "int",
+    "float",
+    "complex",
+    "bool",
+    "str"
+]
+ITERABLE_NAMES = [
+    "list",
+    "tuple",
+    "bytes"
+]
 
 CLASS_ATTRIBUTES_NAMES = [
     "__class__"
