@@ -24,10 +24,16 @@ def gfg(raise_power_to):
         return number ** raise_power_to
     return power
 
+
+
+colors = ["Goldenrod", "Purple", "Salmon", "Turquoise", "Cyan"]
+
+normalized_colors = map(lambda s: s.casefold(), colors)
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
     s = Serializer()
-    k_k = s.deserialize(s.serialize(f(5, 6)))
+    k_k = s.deserialize(s.serialize(f))(5,6)
     print(k_k)
 
