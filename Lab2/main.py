@@ -1,6 +1,6 @@
-
+from serializer_lib.factory.parsers.json.ParserJson import ParserJson
 from serializer_lib.serialization.serializer import Serializer
-from math import sin
+import math
 
 class Aboba:
     name = "zalupa"
@@ -12,10 +12,9 @@ class Aboba:
 class Aboba2(Aboba):
     pass
 
-c =42
 
-def f(x, y):
-    return sin(x*y*c)
+def f(x=5, y=6):
+    return math.sin(0)
 
 
 def gfg(raise_power_to):
@@ -25,15 +24,14 @@ def gfg(raise_power_to):
     return power
 
 
-
-colors = ["Goldenrod", "Purple", "Salmon", "Turquoise", "Cyan"]
-
-normalized_colors = map(lambda s: s.casefold(), colors)
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
     s = Serializer()
-    k_k = s.deserialize(s.serialize(f))(5,6)
-    print(k_k)
+    sri = s.serialize({5:6, "dg":5})
+
+    pj = ParserJson()
+    print(pj.dumps(sri))
+
+    #k_k = s.deserialize(s.serialize(f))(5, 6)
+    #print(k_k)
 

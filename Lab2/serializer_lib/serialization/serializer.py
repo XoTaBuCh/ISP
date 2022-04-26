@@ -18,7 +18,6 @@ class Serializer:
         else:
             obj_type = type(obj)
             obj_type_string = re.search(OBJECT_TYPE, str(obj_type)).group(1)
-            print(str(obj_type))
 
             if obj_type == dict:
                 result = self.serialize_dict(obj)
@@ -26,14 +25,16 @@ class Serializer:
                 result = self.serialize_types(obj)
             elif obj_type == list or obj_type == tuple or obj_type == bytes:
                 result = self.serialize_it(obj)
-            elif inspect.isfunction(obj) or inspect.ismethod(obj) or isinstance(obj, staticmethod):
+            elif inspect.isfunction(obj) or inspect.ismethod(obj):
                 result = self.serialize_function(obj)
-            elif inspect.ismodule(obj) or inspect.isbuiltin(obj) or inspect.iscode(obj) or inspect.ismethoddescriptor(obj):
-                result = self.serialize_instance(obj)
+            elif inspect.isbuiltin(obj) or inspect.iscode(obj) or inspect.ismethoddescriptor(obj):
+                result = self.serialize_other(obj)
+            elif inspect.ismodule(obj):
+                result = self.serialize_module(obj)
             elif hasattr(obj, "__dict__"):
                 result = self.serialize_object(obj)
             else:
-                result = self.serialize_instance(obj)
+                result = self.serialize_other(obj)
 
         result[TYPE_FIELD] = obj_type_string
         fd = frozendict(result)
@@ -58,6 +59,8 @@ class Serializer:
             result = self.deserialize_function(obj)
         elif obj_type_string == CLASS_NAME:
             result = self.deserialize_class(obj)
+        elif obj_type_string == MODULE_NAME:
+            result = self.deserialize_module(obj)
         elif obj_type_string == OBJECT_NAME:
             result = self.deserialize_object(obj)
 
@@ -229,7 +232,7 @@ class Serializer:
         print(result_bases)
         return type(result[NAME_FIELD], result_bases, result)
 
-    def serialize_instance(self, obj):
+    def serialize_other(self, obj):
         result = {VALUE_FIELD: {}}
         members = []
 
@@ -246,6 +249,13 @@ class Serializer:
 
     def deserialize_instance(self, obj):
         pass
+
+    def serialize_module(self, obj):
+        result = {VALUE_FIELD: self.serialize(obj.__name__)}
+        return result
+
+    def deserialize_module(self, obj):
+        return __import__(self.deserialize(obj[VALUE_FIELD]))
 
     def serialize_object(self, obj):
         result = {VALUE_FIELD: {}}

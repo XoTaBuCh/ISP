@@ -8,6 +8,7 @@ OBJECT_NAME = "object"
 DICTIONARY_NAME = "dict"
 FUNCTION_NAME = "function"
 CODE_NAME = "code"
+MODULE_NAME = "module"
 
 BASE_NAME = "base"
 DATA_NAME = "data"
