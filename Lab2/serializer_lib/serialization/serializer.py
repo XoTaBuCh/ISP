@@ -17,20 +17,22 @@ class Serializer:
             obj_type_string = CLASS_NAME
         else:
             obj_type = type(obj)
-            obj_type_string = re.search(OBJECT_TYPE, str(obj_type)).group(1)
+            obj_type_string = re.search(OBJECT_TYPE_REGEX, str(obj_type)).group(1)
 
             if obj_type == dict:
                 result = self.serialize_dict(obj)
             elif isinstance(obj, (int, float, complex, bool, str, type(None))) or obj is None:
                 result = self.serialize_types(obj)
-            elif obj_type == list or obj_type == tuple or obj_type == bytes:
+            elif obj_type == list or obj_type == tuple or obj_type == bytes or obj_type == set:
                 result = self.serialize_it(obj)
             elif inspect.isfunction(obj) or inspect.ismethod(obj):
                 result = self.serialize_function(obj)
-            elif inspect.isbuiltin(obj) or inspect.iscode(obj) or inspect.ismethoddescriptor(obj):
+            elif inspect.iscode(obj) or inspect.ismethoddescriptor(obj):
                 result = self.serialize_other(obj)
             elif inspect.ismodule(obj):
                 result = self.serialize_module(obj)
+            elif inspect.isbuiltin(obj):
+                result = self.serialize_builtin(obj)
             elif hasattr(obj, "__dict__"):
                 result = self.serialize_object(obj)
             else:
@@ -61,6 +63,8 @@ class Serializer:
             result = self.deserialize_class(obj)
         elif obj_type_string == MODULE_NAME:
             result = self.deserialize_module(obj)
+        #elif obj_type_string == BUILTIN_NAME:
+         #   result = self.deserialize_builtin(obj)
         elif obj_type_string == OBJECT_NAME:
             result = self.deserialize_object(obj)
 
@@ -87,14 +91,19 @@ class Serializer:
         return result
 
     def serialize_types(self, obj):
-        result = {VALUE_FIELD: obj}
+        result = {VALUE_FIELD: str(obj)}
 
         return result
 
     def deserialize_types(self, obj):
         result = object
-
-        if obj[TYPE_FIELD] == TYPES_NAMES[3]:
+        if obj[TYPE_FIELD] == TYPES_NAMES[0]:
+            result = int(obj[VALUE_FIELD])
+        elif obj[TYPE_FIELD] == TYPES_NAMES[1]:
+            result = float(obj[VALUE_FIELD])
+        elif obj[TYPE_FIELD] == TYPES_NAMES[2]:
+            result = complex(obj[VALUE_FIELD])
+        elif obj[TYPE_FIELD] == TYPES_NAMES[3]:
             result = (obj[VALUE_FIELD] == "True")
         elif obj[TYPE_FIELD] == TYPES_NAMES[5]:
             result = None
@@ -108,6 +117,8 @@ class Serializer:
 
         for value in obj:
             result[VALUE_FIELD].append(self.serialize(value))
+
+        result[VALUE_FIELD] = tuple(result[VALUE_FIELD])
 
         return result
 
@@ -124,6 +135,8 @@ class Serializer:
             result = tuple(result)
         elif obj[TYPE_FIELD] == ITERABLE_NAMES[2]:
             result = bytes(result)
+        elif obj[TYPE_FIELD] == ITERABLE_NAMES[3]:
+            result = set(result)
 
         return result
 
@@ -255,6 +268,17 @@ class Serializer:
         return result
 
     def deserialize_module(self, obj):
+        return __import__(self.deserialize(obj[VALUE_FIELD]))
+
+    def serialize_builtin(self, obj):
+        if obj.__module__ != None:
+            result = {VALUE_FIELD: self.serialize(str(obj.__module__) + "." + str(obj.__name__))}
+        else:
+            result = {VALUE_FIELD: self.serialize(obj.__name__)}
+        return result
+
+    def deserialize_builtin(self, obj):
+        print(obj)
         return __import__(self.deserialize(obj[VALUE_FIELD]))
 
     def serialize_object(self, obj):

@@ -1,5 +1,6 @@
 
-OBJECT_TYPE = "\'([\w\W]+)\'"
+OBJECT_TYPE_REGEX = "\'([\w\W]+)\'"
+
 TYPE_FIELD = "TYPE"
 VALUE_FIELD = "VALUE"
 
@@ -9,6 +10,7 @@ DICTIONARY_NAME = "dict"
 FUNCTION_NAME = "function"
 CODE_NAME = "code"
 MODULE_NAME = "module"
+BUILTIN_NAME = "builtin_function_or_method"
 
 BASE_NAME = "base"
 DATA_NAME = "data"
@@ -26,7 +28,8 @@ TYPES_NAMES = [
 ITERABLE_NAMES = [
     "list",
     "tuple",
-    "bytes"
+    "bytes",
+    "set"
 ]
 
 CLASS_ATTRIBUTE_NAME = "__class__"
