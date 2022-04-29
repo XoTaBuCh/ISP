@@ -1,17 +1,20 @@
 from serializer_lib.factory.parsers.parser import Parser
-from salt.serializers.toml import serialize, deserialize
-from tomli_w import dumps
+from toml import dumps, loads
+
 
 class ParserToml(Parser):
 
     def dump(self, obj, file):  # obj to file
-        file.write(dumps(obj))
+        with open(file, "w") as f:
+            f.write(self.dumps(obj))
 
     def dumps(self, obj):  # obj to string
-        return dumps(obj)
+        result = dumps(self.serializer.serialize(obj))
+        return result
 
     def load(self, file):  # file to obj
-        return deserialize(file.read())
+        with open(file, "r") as f:
+            return self.loads(f.read())
 
     def loads(self, string):  # string to obj
-        return deserialize(string)
+        return self.serializer.deserialize(loads(string))

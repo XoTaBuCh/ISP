@@ -1,0 +1,224 @@
+!!python/object/apply:frozendict.frozendict
+- TYPE: function
+  VALUE:
+    ? !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: __closure__
+    : !!python/object/apply:frozendict.frozendict
+    - TYPE: NoneType
+      VALUE: None
+    ? !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: __code__
+    : !!python/object/apply:frozendict.frozendict
+    - TYPE: code
+      VALUE:
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_argcount
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '2'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_cellvars
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: tuple
+          VALUE: !!python/tuple []
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_code
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: bytes
+          VALUE: !!python/tuple
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '116'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '160'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '1'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '124'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '124'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '1'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '20'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '116'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '2'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '20'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '161'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '1'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '83'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_consts
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: tuple
+          VALUE: !!python/tuple
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: NoneType
+              VALUE: None
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_filename
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: /home/ubuntu/Documents/Study/Python/ISP/Lab2/tests/objects.py
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_firstlineno
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '42'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_flags
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '67'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_freevars
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: tuple
+          VALUE: !!python/tuple []
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_kwonlyargcount
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '0'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_lnotab
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: bytes
+          VALUE: !!python/tuple
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '0'
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: int
+              VALUE: '1'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_name
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: function_sin_test
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_names
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: tuple
+          VALUE: !!python/tuple
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: str
+              VALUE: math
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: str
+              VALUE: sin
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: str
+              VALUE: test_int
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_nlocals
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '2'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_posonlyargcount
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '0'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_stacksize
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '4'
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: co_varnames
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: tuple
+          VALUE: !!python/tuple
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: str
+              VALUE: x
+          - !!python/object/apply:frozendict.frozendict
+            - TYPE: str
+              VALUE: y
+    ? !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: __globals__
+    : !!python/object/apply:frozendict.frozendict
+    - TYPE: dict
+      VALUE:
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: math
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: module
+          VALUE: !!python/object/apply:frozendict.frozendict
+          - TYPE: str
+            VALUE: math
+        ? !!python/object/apply:frozendict.frozendict
+        - TYPE: str
+          VALUE: test_int
+        : !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '42'
+    ? !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: __defaults__
+    : !!python/object/apply:frozendict.frozendict
+    - TYPE: tuple
+      VALUE: !!python/tuple
+      - !!python/object/apply:frozendict.frozendict
+        - TYPE: int
+          VALUE: '8'
+    ? !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: __name__
+    : !!python/object/apply:frozendict.frozendict
+    - TYPE: str
+      VALUE: function_sin_test

@@ -32,7 +32,12 @@ ITERABLE_NAMES = [
     "set"
 ]
 
-CLASS_ATTRIBUTE_NAME = "__class__"
+CLASS_ATTRIBUTE_NAMES = ["__class__",
+                         "__doc__",
+                         "__getattribute__",
+                         "__new__",
+                         "__setattr__"
+]
 
 FUNCTION_ATTRIBUTES_NAMES = [
     "__code__",
@@ -57,6 +62,8 @@ OBJECT_ATTRIBUTES_NAMES = [
 CODE_FIELD = "__code__"
 GLOBAL_FIELD = "__globals__"
 NAME_FIELD = "__name__"
+
+DOC_ATTRIBUTE_NAME = "__doc__"
 
 CO_NAMES_FIELD = "co_names"
 

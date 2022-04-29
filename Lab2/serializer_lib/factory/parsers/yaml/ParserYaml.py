@@ -7,13 +7,15 @@ import yaml
 class ParserYaml(Parser):
 
     def dump(self, obj, file):  # obj to file
-        file.write(yaml.dump(obj))
+        with open(file, "w") as f:
+            f.write(self.dumps(obj))
 
     def dumps(self, obj):  # obj to string
-        return yaml.dump(obj)
+        return yaml.dump(self.serializer.serialize(obj))
 
     def load(self, file):  # file to obj
-        return yaml.load(file.read(), Loader=UnsafeLoader)
+        with open(file, "r") as f:
+            return self.loads(f.read())
 
     def loads(self, string):  # string to obj
-        return yaml.load(string, Loader=UnsafeLoader)
+        return self.serializer.deserialize(yaml.load(string, Loader=UnsafeLoader))

@@ -31,24 +31,24 @@ class Serializer:
                 result = self.serialize_other(obj)
             elif inspect.ismodule(obj):
                 result = self.serialize_module(obj)
-            elif inspect.isbuiltin(obj):
-                result = self.serialize_builtin(obj)
+            #elif inspect.isbuiltin(obj) and obj.__module__ is not None:
+            #    result = self.serialize_builtin(obj)
             elif hasattr(obj, "__dict__"):
                 result = self.serialize_object(obj)
+                result[TYPE_FIELD] = OBJECT_NAME
+                return frozendict(result)
             else:
                 result = self.serialize_other(obj)
 
         result[TYPE_FIELD] = obj_type_string
-        fd = frozendict(result)
 
-        return fd
+        return frozendict(result)
 
     def deserialize(self, obj: dict):
         try:
             obj_type_string = obj[TYPE_FIELD]
         except:
             print("Type cannot be found!")
-
         result = object
 
         if obj_type_string == DICTIONARY_NAME:
@@ -64,9 +64,11 @@ class Serializer:
         elif obj_type_string == MODULE_NAME:
             result = self.deserialize_module(obj)
         #elif obj_type_string == BUILTIN_NAME:
-         #   result = self.deserialize_builtin(obj)
+        #    result = self.deserialize_builtin(obj)
         elif obj_type_string == OBJECT_NAME:
             result = self.deserialize_object(obj)
+        else:
+            return
 
         return result
 
@@ -76,12 +78,15 @@ class Serializer:
         for key, value in obj.items():
             result_key = self.serialize(key)
             result_value = self.serialize(value)
-            result[VALUE_FIELD][result_key] = result_value
 
+            result[VALUE_FIELD][result_key] = result_value
         return result
 
-    def deserialize_dict(self, obj: dict):
+    def deserialize_dict(self, obj):
         result = {}
+
+        if type(obj[VALUE_FIELD]) == tuple:
+            return {}
 
         for key, value in obj[VALUE_FIELD].items():
             result_key = self.deserialize(key)
@@ -162,16 +167,17 @@ class Serializer:
 
                 global_attributes = obj.__getattribute__(GLOBAL_FIELD)
 
+                new_dict = dict()
                 for attribute in value.__getattribute__(CO_NAMES_FIELD):
-                    result_attribute = self.serialize(attribute)
 
                     if attribute == obj.__name__:
-                        result[VALUE_FIELD][global_key][result_attribute] = self.serialize(obj.__name__)
+                        new_dict[attribute] = obj.__name__
                     elif attribute in global_attributes:
                         if inspect.ismodule(global_attributes[attribute]) and attribute in __builtins__:
                             continue
-                        result[VALUE_FIELD][global_key][result_attribute] = self.serialize(global_attributes[attribute])
+                        new_dict[attribute] = global_attributes[attribute]
 
+                result[VALUE_FIELD][global_key] = self.serialize(new_dict)
         return result
 
     def deserialize_function(self, obj):
@@ -192,8 +198,8 @@ class Serializer:
                 function_arguments = [CodeType(*code_arguments)]
 
             elif key == GLOBAL_FIELD:
-                for argument_key, argument_value in obj[VALUE_FIELD][self.serialize(GLOBAL_FIELD)].items():
-                    global_arguments[self.deserialize(argument_key)] = self.deserialize(argument_value)
+                for argument_key, argument_value in self.deserialize(obj[VALUE_FIELD][self.serialize(GLOBAL_FIELD)]).items():
+                    global_arguments[argument_key] = argument_value
                 function_arguments.append(global_arguments)
 
             else:
@@ -212,45 +218,42 @@ class Serializer:
         bases = []
 
         for base in obj.__bases__:
-            if obj.__name__ != OBJECT_NAME:
-                bases.append(self.serialize(base))
+            if base.__name__ != OBJECT_NAME:
+                bases.append(base)
         result[VALUE_FIELD][self.serialize(BASE_NAME)] = self.serialize(bases)
 
         for member in inspect.getmembers(obj):
-            if member[0] != CLASS_ATTRIBUTE_NAME:
+            if member[0] not in CLASS_ATTRIBUTE_NAMES:
                 members.append(member)
 
         result_data = self.serialize(DATA_NAME)
-        result[VALUE_FIELD][result_data] = {}
 
-        result[VALUE_FIELD][result_data][self.serialize(NAME_FIELD)] = self.serialize(obj.__name__)
+        new_dict = {NAME_FIELD: obj.__name__}
 
-        for key, value in members:
-            result_key = self.serialize(key)
-            result_value = self.serialize(value)
-            result[VALUE_FIELD][result_data][result_key] = result_value
+        for member in members:
+
+            new_dict[member[0]] = member[1]
+
+        result[VALUE_FIELD][result_data] = self.serialize(new_dict)
 
         return result
 
     def deserialize_class(self, obj):
-        result = {}
         result_data = self.serialize(DATA_NAME)
 
         result_bases = tuple(self.deserialize(obj[VALUE_FIELD][self.serialize(BASE_NAME)]))
 
-        for key, value in obj[VALUE_FIELD][result_data].items():
-            result_key = self.deserialize(key)
-            result_value = self.deserialize(value)
-            result[result_key] = result_value
-        print(result_bases)
-        return type(result[NAME_FIELD], result_bases, result)
+        result = self.deserialize(obj[VALUE_FIELD][result_data])
+        result_name = result[NAME_FIELD]
+        del result[NAME_FIELD]
+        return type(result_name, (object,), result)
 
     def serialize_other(self, obj):
         result = {VALUE_FIELD: {}}
         members = []
 
         for member in inspect.getmembers(obj):
-            if not callable(member[1]):
+            if not callable(member[1]) and member[0] != DOC_ATTRIBUTE_NAME:
                 members.append(member)
 
         for key, value in members:
@@ -271,15 +274,18 @@ class Serializer:
         return __import__(self.deserialize(obj[VALUE_FIELD]))
 
     def serialize_builtin(self, obj):
-        if obj.__module__ != None:
-            result = {VALUE_FIELD: self.serialize(str(obj.__module__) + "." + str(obj.__name__))}
+        if obj.__module__ is not None:
+            result = {VALUE_FIELD: self.serialize([str(obj.__module__), str(obj.__name__)])}
         else:
-            result = {VALUE_FIELD: self.serialize(obj.__name__)}
+            result = {VALUE_FIELD: self.serialize([obj.__name__])}
         return result
 
     def deserialize_builtin(self, obj):
-        print(obj)
-        return __import__(self.deserialize(obj[VALUE_FIELD]))
+        result = self.deserialize(obj[VALUE_FIELD])
+        if len(result) == 1:
+            return __import__(result[0])
+        else:
+            return __import__(result[0], result[1])
 
     def serialize_object(self, obj):
         result = {VALUE_FIELD: {}}

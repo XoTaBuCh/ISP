@@ -1,0 +1,4 @@
+{"from_file":"tests/files/TOMLtest.toml",
+"to_file":"tests/files/YAMLtest.yaml",
+"from_type":"toml",
+"to_type":"yaml"}
