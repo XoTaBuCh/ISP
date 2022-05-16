@@ -21,15 +21,14 @@ setup(
     url="https://github.com/XoTaBuCh/ISP",
     author="XoT@B",
     author_email="tanzanit2003@gmail.com",
-    license="BSUIR",
+    license="MIT",
     classifiers=[
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSUIR License",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent"
     ],
     packages=find_packages(),
-    include_package_data=True,
-    install_requires=["frozendict~=2.3.1", "salt~=3004.1", "PyYAML~=5.4.1"]
+    include_package_data=True
 )

@@ -44,11 +44,16 @@ def test_classes(parser="json"):
     car_ser = parser.loads(parser.dumps(Car))()
     assert car_orig.get_info() == car_ser.get_info()
 
+a = A()
 
 def test_objects(parser="yaml"):
     parser = Factory.get_parser(parser)
     car_orig = Car(5000, "White")
     car_ser = parser.loads(parser.dumps(car_orig))
-    assert car_orig.get_model() == car_ser.get_model()
+    assert car_orig.meth() == car_ser.meth()
     assert car_orig.get_color() == car_ser.get_color()
     assert car_orig.get_info() == car_ser.get_info()
+
+    fake_a = parser.loads(parser.dumps(a))
+    assert a.meth() == fake_a.meth()
+

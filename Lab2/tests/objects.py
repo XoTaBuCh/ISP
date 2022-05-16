@@ -55,6 +55,9 @@ class OldCar:
     def get_model(self):
         return self.model
 
+    def meth(self):
+        return 5
+
 
 class Car(OldCar):
     def __init__(self, weight=5000, color="White"):
@@ -70,3 +73,13 @@ class Car(OldCar):
 
 class UpgradeCar(Car):
     pass
+
+
+class B:
+    def meth(self):
+        return 5
+
+
+class A(B):
+    def __init__(self):
+        pass
