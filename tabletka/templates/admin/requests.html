@@ -1,0 +1,113 @@
+{% extends "./../base.html" %}
+
+{% block nav-content %}
+
+    <form class="d-grid gap-2" th:action="@{/admin}" th:method="get">
+        <input class="btn btn-success" type="submit" value="Fuck go Back">
+    </form>
+{% endblock %}
+
+{% block main-content %}
+    <div class="container-fluid w-75">
+
+        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#registryRequests"
+                        type="button" role="tab" aria-controls="home" aria-selected="true">Registration requests
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#creatingRequests"
+                        type="button" role="tab" aria-controls="profile" aria-selected="false">Creation requests
+                </button>
+            </li>
+
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="registryRequests" role="tabpanel" aria-labelledby="home-tab">
+
+                <ul class="list-group mt-5 w-75 mx-auto">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-primary"
+                        th:if="${registryRequests != null}">
+                        <span class="text-white">Id</span>
+                        <span class="text-white">Email</span>
+                        <span class="text-white">Status</span>
+
+                    </li>
+
+                    <form class="list-group-item d-flex justify-content-between align-items-center"
+                          th:each="request : ${registryRequests}"
+                          th:method="post">
+                        <input type="hidden" th:name="requestId" th:value="${request.id}">
+                        <span th:text="${request.id}"></span>
+                        <span th:text="${request.email}"></span>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-success active" th:name="flag"
+                                    th:value="registration_true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-check" viewBox="0 0 16 16">
+                                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                </svg>
+                            </button>
+                            <button type="submit" class="btn btn-danger active" th:name="flag"
+                                    th:value="registration_false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                    </form>
+
+                </ul>
+
+            </div>
+            <div class="tab-pane fade" id="creatingRequests" role="tabpanel" aria-labelledby="profile-tab">
+
+                <ul class="list-group mt-5 w-75 mx-auto">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-primary"
+                        th:if="${pharmacyCreatingRequests != null}">
+                        <span class="text-white">Id</span>
+                        <span class="text-white">Name</span>
+                        <span class="text-white">Address</span>
+                        <span class="text-white">Status</span>
+
+                    </li>
+
+                    <form class="list-group-item d-flex justify-content-between align-items-center"
+                          th:each="request : ${pharmacyCreatingRequests}"
+                          th:method="post">
+                        <input type="hidden" th:name="requestId" th:value="${request.id}">
+                        <span th:text="${request.id}"></span>
+                        <span th:text="${request.name}"></span>
+                        <span th:text="${request.address}"></span>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-success active" th:name="flag"
+                                    th:value="creation_true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-check" viewBox="0 0 16 16">
+                                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                </svg>
+                            </button>
+                            <button type="submit" class="btn btn-danger active" th:name="flag"
+                                    th:value="creation_false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                    </form>
+
+                </ul>
+
+
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "./../base.html" %}
+
+{% block nav-content %}
+        <form class="d-grid gap-2" th:action="@{/}" th:method="get">
+            <input class="btn btn-success" type="submit" value="Fuck go Back">
+        </form>
+{% endblock %}
+
+
+{% block main-content %}
+<form method="post" th:action="@{/apothecary/add_pharmacy}" th:object="${pharmacy}">
+
+    <div class="mb-3 mx-auto mt-5" style="width: 20%">
+        <label for="name" class="form-label">Name</label>
+        <input type="name" th:name="name" required class="form-control" id="name">
+    </div>
+    <div class="mb-3 mx-auto" style="width: 20%">
+        <label for="address" class="form-label">Address</label>
+        <input type="name" th:name="address" required class="form-control" id="address">
+    </div>
+
+    <div class="d-grid gap-2">
+        <input class="btn btn-primary mx-auto" type="submit" value="Add pharmacy" width="20%"/>
+    </div>
+</form>
+
+<div class="alert alert-success w-50 mt-5 mx-auto" role="alert" th:if="${registerSuccess != null}">
+    <h4 class="alert-heading">You applied for registration pharmacy</h4>
+</div>
+
+{% endblock %}

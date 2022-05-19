@@ -1,0 +1,27 @@
+{% extends "./../base.html" %}
+
+{% block nav-content %}
+    <form class="d-grid gap-2" action="/auth" method="get">
+        <input class="btn btn-primary" type="submit" value="Fuck go Back">
+    </form>
+{% endblock %}
+
+
+{% block main-content %}
+    <form method="POST" action="">
+        {% csrf_token %}
+
+    <div class="mb-3 mx-auto mt-5" style="width: 20%">
+        <label for="em" class="form-label">Email</label>
+        <input type="email" th:name="email" required class="form-control" id="em">
+    </div>
+    <div class="mb-3 mx-auto" style="width: 20%">
+        <label for="pass" class="form-label">Password</label>
+        <input type="password" th:name="password" minlength="6" required class="form-control" id="pass">
+    </div>
+
+    <div class="d-grid gap-2">
+        <input class="btn btn-primary mx-auto" type="submit" value="Register" width="20%"/>
+    </div>
+</form>
+{% endblock %}

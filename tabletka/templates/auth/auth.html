@@ -1,0 +1,21 @@
+{% extends "./../base.html" %}
+
+{% block nav-content %}
+    <form class="d-grid gap-2" action="/" method="get">
+        <input class="btn btn-primary" type="submit" value="Fuck go Back">
+    </form>
+{% endblock %}
+
+{% block main-content %}
+    <div class="d-grid gap-2">
+        <form class="d-grid gap-2 w-25 mt-3 mx-auto" action="/auth/login">
+            <input class="btn btn-primary" type="submit" value="Login"/>
+        </form>
+        <form class="d-grid gap-2 w-25 mx-auto" action="/auth/register">
+            <input class="btn btn-primary" type="submit" value="Register"/>
+        </form>
+        <form class="d-grid gap-2 w-25 mx-auto" action="/auth/register_apothecary">
+            <input class="btn btn-primary" type="submit" value="Register ass Apothecary"/>
+        </form>
+    </div>
+{% endblock %}
