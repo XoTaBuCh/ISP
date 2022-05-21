@@ -18,11 +18,6 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ["username", "email", 'password1', 'password2', 'first_name', 'last_name']
 
-    # class Meta:
-    #
-    #     model = Client
-    #     fields = ["first_name", "last_name", "email", "phone", "address"]
-
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -47,31 +42,31 @@ class ClientForm(forms.ModelForm):
         fields = ["phone", "address"]
 
 
-# class ApothecaryForm(forms.ModelForm):
-#     class Meta:
-#         model = Apothecary
-#         fields = ["name", "description", "fabricator", "type"]
+class ApothecaryForm(forms.ModelForm):
+    class Meta:
+        model = Apothecary
+        fields = []
 
 
 class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
-        fields = ["name", "description", "fabricator"]
+        fields = ["name", "description", "fabricator", "type", "image"]
 
 
 class PharmacyForm(forms.ModelForm):
     class Meta:
         model = Pharmacy
-        fields = ["name", "address", "apothecary"]
+        fields = ["name", "address"]
 
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ["price", "amount", "pharmacy", "medicine"]
+        fields = ["price", "amount"]
 
 
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ["price", "amount", "pharmacy", "client", "product"]
+        fields = ["amount"]
