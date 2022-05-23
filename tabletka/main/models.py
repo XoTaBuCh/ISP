@@ -2,16 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
-
 MEDICINE_TYPES = [("PL", "PILLS"),
                   ("CP", "CAPSULES"),
                   ("PW", "POWDERS"),
                   ("SR", "SYRUP"),
                   ("MX", "MIXTURE"),
                   ("ON", "OINTMENT")]
-ORDER_STATUS = [("AC", "ACTIVE"),
+ORDER_STATUS = [("IC", "IN CART"),
+                ("AC", "ACTIVE"),
                 ("DN", "DONE"),
-                ("CN", "CANCELED")]
+                ("CN", "CANCELED"),
+                ("DL", "DELETED")]
 
 
 class Client(models.Model):

@@ -1,7 +1,7 @@
 {% extends "./../base.html" %}
 
 {% block nav-content %}
-    <form class="d-grid gap-2" th:action="@{/auth}" th:method="get">
+    <form class="d-grid gap-2" action="@{/auth}" method="get">
         <input class="btn btn-success" type="submit" value="Fuck go Back">
     </form>
 {% endblock %}
@@ -24,39 +24,39 @@
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="newMedicine" role="tabpanel" aria-labelledby="home-tab">
-                <form method="post" th:action="@{'/pharmacy/' + ${pharmacyId} + '/add_product'}"
-                      th:object="${newMedicine}">
+                <form method="post" action="@{'/pharmacy/' + ${pharmacyId} + '/add_product'}"
+                      object="${newMedicine}">
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="name" class="form-label">Name</label>
-                        <input type="name" th:name="name" required class="form-control" id="name">
+                        <input type="name" name="name" required class="form-control" id="name">
                     </div>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="description" class="form-label">Description</label>
-                        <input type="name" th:name="description" required class="form-control" id="description">
+                        <input type="name" name="description" required class="form-control" id="description">
                     </div>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="fabricator" class="form-label">Fabricator</label>
-                        <input type="name" th:name="fabricator" required class="form-control" id="fabricator">
+                        <input type="name" name="fabricator" required class="form-control" id="fabricator">
                     </div>
 
-                    <select class="form-select mx-auto mt-5" required th:name="medicinesType" style="width: 20%">
-                        <option th:each="type : ${types}"
-                                th:text="${type}"
-                                th:value="${type}">
+                    <select class="form-select mx-auto mt-5" required name="medicinesType" style="width: 20%">
+                        <option each="type : ${types}"
+                                text="${type}"
+                                value="${type}">
                         </option>
                     </select>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="amountNew" class="form-label">Amount</label>
-                        <input type="number" th:name="amount" required class="form-control" id="amountNew">
+                        <input type="number" name="amount" required class="form-control" id="amountNew">
                     </div>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="priceNew" class="form-label">Price</label>
-                        <input type="number" th:name="price" required class="form-control" id="priceNew">
+                        <input type="number" name="price" required class="form-control" id="priceNew">
                     </div>
 
                     <div class="d-grid gap-2">
@@ -65,26 +65,26 @@
                 </form>
             </div>
             <div class="tab-pane fade" id="existingMedicine" role="tabpanel" aria-labelledby="profile-tab">
-                <form method="post" th:action="@{'/pharmacy/' + ${pharmacyId} + '/add_product'}"
-                      th:object="${newMedicine}">
+                <form method="post" action="@{'/pharmacy/' + ${pharmacyId} + '/add_product'}"
+                      object="${newMedicine}">
 
 
-                    <select class="form-select mx-auto mt-5" multiple th:name="id" required style="width: 20%">
-                        <option th:each="medicine : ${medicines}"
-                                th:text="${medicine.name}"
-                                th:value="${medicine.id}">
+                    <select class="form-select mx-auto mt-5" multiple name="id" required style="width: 20%">
+                        <option each="medicine : ${medicines}"
+                                text="${medicine.name}"
+                                value="${medicine.id}">
                         </option>
 
                     </select>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="amountEx" class="form-label">Amount</label>
-                        <input type="number" th:name="amount" required class="form-control" id="amountEx">
+                        <input type="number" name="amount" required class="form-control" id="amountEx">
                     </div>
 
                     <div class="mb-3 mx-auto mt-5" style="width: 20%">
                         <label for="priceEx" class="form-label">Price</label>
-                        <input type="number" th:name="price" required class="form-control" id="priceEx">
+                        <input type="number" name="price" required class="form-control" id="priceEx">
                     </div>
 
                     <div class="d-grid gap-2">
@@ -97,7 +97,7 @@
     </div>
 
 
-    <div class="alert alert-success w-50 mt-5 mx-auto" role="alert" th:if="${registerSuccess != null}">
+    <div class="alert alert-success w-50 mt-5 mx-auto" role="alert" if="${registerSuccess != null}">
         <h4 class="alert-heading">New product added</h4>
     </div>
 {% endblock %}

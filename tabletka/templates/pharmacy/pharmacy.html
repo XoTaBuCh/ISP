@@ -75,7 +75,7 @@
                     <tr>
                         <form method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="productId" value="{{ product.id }}">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
                             <td align="center"><a
                                     href="/medicine/{{ product.medicine.id }}">{{ product.medicine.name }}</a></td>
                             <td align="center"><span>{{ product.medicine.description }}</span></td>

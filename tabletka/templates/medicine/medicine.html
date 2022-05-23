@@ -63,7 +63,7 @@
             <form class="list-group-item d-flex justify-content-between align-items-center" method="POST">
                 {% csrf_token %}
 
-                <input type="hidden" name="productId" value="{{ product.id }}">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
                 <a href="/pharmacy/{{ product.pharmacy.id }}">{{ product.pharmacy.name }}</a>
                 <span>{{ product.pharmacy.address }}</span>
                 <span>{{ product.amount }}</span>
