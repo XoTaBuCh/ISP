@@ -1,10 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView, LoginView, LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max, Min
 
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import UpdateView, DetailView
 
 from .models import *
 from django.contrib.auth import logout, login, authenticate
@@ -54,8 +60,8 @@ class ClientMainView(View):
 class ClientCartView(View):
 
     def get(self, request):
-        orders = Order.objects.filter(client__user_id=request.user.pk, status="IC")
-        history = Order.objects.filter(client__user_id=request.user.pk).exclude(status="IC")
+        orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS[0][0])
+        history = Order.objects.filter(client__user_id=request.user.pk).exclude(status=ORDER_STATUS[0][0])
 
         return render(request, "client/shopping_cart.html", {"orders": orders, "history": history})
 
@@ -65,7 +71,7 @@ class ClientCartView(View):
             return redirect("main")
         else:
             if request.POST.get("make_order") == "True":
-                orders = Order.objects.filter(client__user_id=request.user.pk, status="IC")
+                orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS[0][0])
                 for order in orders:
                     try:
                         product = Product.objects.get(id=order.product.pk, amount__gte=order.amount)
@@ -127,94 +133,6 @@ class AddPharmacyView(View):
             return render(request, "apothecary/add_pharmacy.html", {"messages": messages})
 
 
-class LoginView(View):
-    def post(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect('main')
-        else:
-            messages.info(request, 'Username or password is not correct')
-        return render(request, 'auth/login.html', {})
-
-    def get(self, request):
-        return render(request, 'auth/login.html')
-
-
-class LogoutView(View):
-    def get(self, request):
-        user = request.user
-
-        if user.is_authenticated:
-            logout(request)
-
-        return redirect('main')
-
-
-class AuthView(View):
-    def get(self, request):
-        return render(request, "auth/auth.html")
-
-
-class RegisterView(View):
-    def get(self, request):
-        user_form = UserForm()
-        client_form = ClientForm()
-        return render(request, 'auth/register.html', {'user_form': user_form, 'client_form': client_form})
-
-    def post(self, request):
-        with ThreadPoolExecutor() as executor:
-            user_thread = executor.submit(UserForm, request.POST)
-            client_thread = executor.submit(ClientForm, request.POST)
-
-            user_form = user_thread.result()
-            client_form = client_thread.result()
-
-        if User.objects.filter(username=request.POST.get('username')).exists():
-            messages.error(request, 'This username already registered on site.')
-            return redirect('reg_client')
-
-        if user_form.is_valid() and client_form.is_valid():
-            new_user = user_form.save()
-            client_new = Client.objects.create(user=new_user)
-            client_new.phone_number = client_form.cleaned_data.get('phone', '')
-            client_new.address = client_form.cleaned_data.get('address', '')
-            client_new.save()
-            return redirect('auth')
-        else:
-            messages.error(request, 'Your data is incorrect')
-            return redirect('reg_client')
-
-
-class RegisterApothecaryView(View):
-    def get(self, request):
-        user_form = UserForm()
-        apothecary_form = ApothecaryForm()
-        return render(request, 'auth/register.html', {'user_form': user_form, 'apothecary_form': apothecary_form})
-
-    def post(self, request):
-        with ThreadPoolExecutor() as executor:
-            user_thread = executor.submit(UserForm, request.POST)
-            apothecary_thread = executor.submit(ApothecaryForm, request.POST)
-
-            user_form = user_thread.result()
-            apothecary_form = apothecary_thread.result()
-
-        if User.objects.filter(username=request.POST.get('username')).exists():
-            messages.error(request, 'This username already registered on site.')
-            return redirect('reg_apothecary')
-
-        if user_form.is_valid() and apothecary_form.is_valid():
-            new_user = user_form.save()
-            apothecary_new = Apothecary.objects.create(user=new_user)
-            apothecary_new.save()
-            return redirect('auth')
-        else:
-            messages.error(request, 'Your data is incorrect')
-            return redirect('reg_client')
 
 
 class MedicineView(View):
@@ -303,3 +221,32 @@ class PharmacyOrderView(View):
                 messages.info(request, "Order doesn't exists")
 
         return redirect(request.path)
+
+
+class PharmacyAddProductView(View):
+    def get(self, request, pharmacy_id):
+        medicines = Medicine.objects.all();
+        medicine_form = MedicineForm()
+        product_form = ProductForm()
+
+        return render(request, "pharmacy/add_product.html",
+                      {"medicines": medicines, "medicine_form": medicine_form, "product_form": product_form,
+                       "types": MEDICINE_TYPES})
+
+
+class ProfileView(SuccessMessageMixin, UpdateView):
+    model = Client
+    form_class = ClientForm
+    template_name = "main/profile.html"
+    success_message = "Successfully Changed Your Profile"
+    success_url = reverse_lazy('main')
+
+    def get_object(self):
+        return Client.objects.get(user_id=self.request.user.pk)
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'main/change_password.html'
+    form_class = PasswordChangeForm
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy('main')

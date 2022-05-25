@@ -1,0 +1,10 @@
+<label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+<input type="{{ field.widget_type }}" name="{{ field.name }}" required class="form-control"
+       id="{{ field.id_for_label }}"
+       value="{% if field.value != None %}{{ field.value }}{% endif %}">
+
+{% for error in field.errors %}
+    <div class="alert alert-dismissible alert-danger mx-auto mt-1">
+        {{ error|escape }}
+    </div>
+{% endfor %}

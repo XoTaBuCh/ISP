@@ -1,29 +1,35 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from phonenumber_field.modelfields import PhoneNumberField
 
-MEDICINE_TYPES = [("PL", "PILLS"),
-                  ("CP", "CAPSULES"),
-                  ("PW", "POWDERS"),
-                  ("SR", "SYRUP"),
-                  ("MX", "MIXTURE"),
-                  ("ON", "OINTMENT")]
-ORDER_STATUS = [("IC", "IN CART"),
-                ("AC", "ACTIVE"),
-                ("DN", "DONE"),
-                ("CN", "CANCELED"),
-                ("DL", "DELETED")]
+MEDICINE_TYPES = [("PILLS", "PILLS"),
+                  ("CAPSULES", "CAPSULES"),
+                  ("POWDERS", "POWDERS"),
+                  ("SYRUP", "SYRUP"),
+                  ("MIXTURE", "MIXTURE"),
+                  ("OINTMENT", "OINTMENT")]
+ORDER_STATUS = [("IN CART", "IN CART"),
+                ("ACTIVE", "ACTIVE"),
+                ("DONE", "DONE"),
+                ("CANCELED", "CANCELED"),
+                ("DELETED", "DELETED")]
 
 
 class Client(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, blank=True)
-    phone = models.CharField(max_length=10)
-    address = models.TextField(blank=True, null=True)
+    phone = PhoneNumberField()
+    address = models.TextField(blank=True)
     createdAt = models.DateTimeField("Created At", auto_now_add=True)
 
 
 class Apothecary(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, blank=True)
+    about_education = models.TextField(blank=True)
+    experience = models.PositiveIntegerField("Experience", blank=True)
     createdAt = models.DateTimeField("Created At", auto_now_add=True)
 
 
@@ -31,15 +37,14 @@ class Medicine(models.Model):
     name = models.CharField("Name", max_length=255)
     description = models.TextField("Description", blank=True)
     fabricator = models.TextField("Fabricator", blank=True)
-    type = models.CharField("Type", max_length=2, choices=MEDICINE_TYPES, default=MEDICINE_TYPES[0][0])
+    type = models.CharField("Type", max_length=10, choices=MEDICINE_TYPES, default=MEDICINE_TYPES[0][0])
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField("Image", blank=True, upload_to="medicines")
 
-    min_price = models.DecimalField("Min price", max_digits=10, decimal_places=2, default=0)
-    max_price = models.DecimalField("Max price", max_digits=10, decimal_places=2, default=0)
-
-    def __str__(self):
-        return self.name
+    min_price = models.DecimalField("Min price", max_digits=10, decimal_places=2, default=0,
+                                    validators=[MinValueValidator(Decimal('0.01'))])
+    max_price = models.DecimalField("Max price", max_digits=10, decimal_places=2, default=0,
+                                    validators=[MinValueValidator(Decimal('0.01'))])
 
 
 class Pharmacy(models.Model):
@@ -47,21 +52,20 @@ class Pharmacy(models.Model):
     address = models.TextField("Address", blank=True)
     apothecary = models.ForeignKey(Apothecary, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.name
-
 
 class Product(models.Model):
-    price = models.DecimalField("Price", max_digits=10, decimal_places=2)
+    price = models.DecimalField("Price", max_digits=10, decimal_places=2,
+                                validators=[MinValueValidator(Decimal('0.01'))])
     amount = models.PositiveIntegerField("Amount")
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
 
 
 class Order(models.Model):
-    price = models.DecimalField("Price", max_digits=10, decimal_places=2)
-    amount = models.PositiveIntegerField("Amount")
-    status = models.CharField("Status", max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
+    price = models.DecimalField("Price", max_digits=10, decimal_places=2,
+                                validators=[MinValueValidator(Decimal('0.01'))])
+    amount = models.PositiveIntegerField("Amount", validators=[MinValueValidator(1)])
+    status = models.CharField("Status", max_length=10, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

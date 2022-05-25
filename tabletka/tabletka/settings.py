@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'main',
-    'captcha',
-    'graphene_django'
+    'phonenumber_field',
+
 ]
 
 REST_FRAMEWORK = {
@@ -111,11 +111,14 @@ DATABASES = {
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'tester',
+        },
     }
 }
 
 GRAPHENE = {
-  "SCHEMA": "blog.schema.schema",
+    "SCHEMA": "blog.schema.schema",
 }
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -164,7 +167,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
         },
         'file': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
@@ -189,3 +192,7 @@ LOGGING = {
         }
     }
 }
+
+LOGIN_REDIRECT_URL = "main"
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = LOGIN_URL
