@@ -1,0 +1,68 @@
+{% extends "./../base.html" %}
+
+{% block nav-content %}
+    <form class="d-grid gap-2" action="/">
+        <button type="submit" class="btn btn-success">
+            Fuck go Back
+        </button>
+    </form>
+{% endblock %}
+
+{% block main-content %}
+    <form class="d-grid gap-2" method="POST" action="">
+        <table class="table w-50 mx-auto">
+            <thead>
+            <tr>
+                <th scope="col"> Info</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody class="table_borders">
+            <tr>
+                <td><img class="img-fluid"
+                         src="{% if product.medicine.image %}{{ product.medicine.image.url }}{% endif %}"></td>
+
+            </tr>
+            <tr>
+                <td><span> Id </span></td>
+                <td><span> {{ product.id }}</span></td>
+
+            </tr>
+            <tr>
+                <td><span> Name </span></td>
+                <td><span>{{ product.medicine.name }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Description </span></td>
+                <td><span>{{ product.medicine.description }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Fabricator </span></td>
+                <td><span>{{ product.medicine.fabricator }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Type </span></td>
+                <td><span>{{ product.medicine.type }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Amount on stock </span></td>
+                <td><span>{{ product.amount }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Price </span></td>
+                <td><span>{{ product.price }}</span></td>
+            </tr>
+            <tr>
+                <td><span> Choose amount </span></td>
+                <td><span>{{ form }}</span></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">
+            Add to cart
+        </button>
+    </form>
+
+
+{% endblock %}

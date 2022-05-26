@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -30,58 +31,54 @@ class RegisterView(CreateView):
     template_name = "auth/register.html"
     form_class = UserForm
 
-    success_url = reverse_lazy("login")
-
     def get_context_data(self, **kwargs):
         context = super(RegisterView, self).get_context_data(**kwargs)
         if self.request.POST:
             context['form'] = UserForm(self.request.POST)
-            context['formC'] = ClientForm(self.request.POST)
+            context['form_client'] = ClientForm(self.request.POST)
         else:
             context['form'] = UserForm()
-            context['formC'] = ClientForm()
+            context['form_client'] = ClientForm()
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
-        formC = context['formC']
-        if formC.is_valid():
-            self.object = form.save()
-            self.object.save()
-            client = formC.save(commit=False)
-            client.user = self.object
+        form_client = context['form_client']
+        if form_client.is_valid():
+            user = form.save()
+            user.save()
+            client = form_client.save(commit=False)
+            client.user = user
             client.save()
-            return redirect(self.get_success_url())
+            return HttpResponseRedirect(settings.LOGIN_URL)
         else:
-            return self.render_to_response(self.get_context_data(formC=formC))
+            return self.render_to_response(self.get_context_data(form_client=form_client))
 
 
 class RegisterApothecaryView(CreateView):
     logger.info("Register apothecary")
-    template_name = "auth/register_apothecary.html.html"
+    template_name = "auth/register_apothecary.html"
     form_class = UserForm
 
-    success_url = reverse_lazy("login")
-
     def get_context_data(self, **kwargs):
-        context = super(RegisterView, self).get_context_data(**kwargs)
+        context = super(RegisterApothecaryView, self).get_context_data(**kwargs)
         if self.request.POST:
             context['form'] = UserForm(self.request.POST)
-            context['formA'] = ApothecaryForm(self.request.POST)
+            context['form_apothecary'] = ApothecaryForm(self.request.POST)
         else:
             context['form'] = UserForm()
-            context['formA'] = ApothecaryForm()
+            context['form_apothecary'] = ApothecaryForm()
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
-        formA = context['formA']
-        if formA.is_valid():
-            self.object = form.save()
-            self.object.save()
-            apothecary = formA.save(commit=False)
-            apothecary.user = self.object
+        form_apothecary = context['form_apothecary']
+        if form_apothecary.is_valid():
+            user = form.save()
+            user.save()
+            apothecary = form_apothecary.save(commit=False)
+            apothecary.user = user
             apothecary.save()
-            return redirect(self.get_success_url())
+            return HttpResponseRedirect(settings.LOGIN_URL)
         else:
-            return self.render_to_response(self.get_context_data(formA=formA))
+            return self.render_to_response(self.get_context_data(form_apothecary=form_apothecary))

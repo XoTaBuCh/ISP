@@ -41,11 +41,6 @@ class Medicine(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField("Image", blank=True, upload_to="medicines")
 
-    min_price = models.DecimalField("Min price", max_digits=10, decimal_places=2, default=0,
-                                    validators=[MinValueValidator(Decimal('0.01'))])
-    max_price = models.DecimalField("Max price", max_digits=10, decimal_places=2, default=0,
-                                    validators=[MinValueValidator(Decimal('0.01'))])
-
 
 class Pharmacy(models.Model):
     name = models.CharField("Name", max_length=255)

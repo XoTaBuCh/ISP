@@ -6,11 +6,15 @@ from django.contrib.auth.views import PasswordChangeView, LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max, Min
+from django.http import HttpResponseRedirect
 
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import UpdateView, DetailView
+from django.views.generic import UpdateView, DetailView, RedirectView, ListView, CreateView
+from django.views.generic.edit import FormMixin
+from search_views.filters import BaseFilter
+from search_views.views import SearchListView
 
 from .models import *
 from django.contrib.auth import logout, login, authenticate
@@ -20,41 +24,51 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class MainView(View):
-    def get(self, request):
-        user = request.user
+class MedicineFilter(BaseFilter):
+    search_fields = {
+        'request': ['name', 'description', 'fabricator'],
+    }
+
+
+class MainView(RedirectView):
+    logger.info("Main")
+
+    def get_redirect_url(self, *args, **kwargs):
+        user = self.request.user
         if not user.is_authenticated:
-            return render(request, "main/main.html")
+            return reverse_lazy("home")
 
         if Client.objects.filter(user_id=user.pk).exists():
-            return redirect("client")
+            url = reverse_lazy("client")
 
         elif Apothecary.objects.filter(user_id=user.pk).exists():
-            return redirect("apothecary")
+            url = reverse_lazy("apothecary")
+
+        elif user.is_superuser:
+            url = reverse_lazy("admin:index")
 
         else:
-            return render(request, "main/main.html")
+            url = reverse_lazy("home")
 
-    def post(self, request):
-        medicines = Medicine.objects.filter(name__contains=request.POST.get("request"))
-        for medicine in medicines:
-            medicine.min_price = Product.objects.filter(medicine_id=medicine.pk).aggregate(Min("price"))["price__min"]
-            medicine.max_price = Product.objects.filter(medicine_id=medicine.pk).aggregate(Max("price"))["price__max"]
-
-        return render(request, "main/main.html", {"medicines": medicines})
+        return url
 
 
-class ClientMainView(View):
-    def get(self, request):
-        return render(request, "client/client_main.html")
+class HomeView(SearchListView):
+    logger.info("Home")
+    template_name = "main/main.html"
+    model = Medicine
+    form_class = MedicineSearchForm
+    filter_class = MedicineFilter
+    context_object_name = "medicines"
 
-    def post(self, request):
-        medicines = Medicine.objects.filter(name__contains=request.POST.get("request"))
-        for medicine in medicines:
-            medicine.min_price = Product.objects.filter(medicine_id=medicine.pk).aggregate(Min("price"))["price__min"]
-            medicine.max_price = Product.objects.filter(medicine_id=medicine.pk).aggregate(Max("price"))["price__max"]
 
-        return render(request, "client/client_main.html", {"medicines": medicines})
+class ClientMainView(SearchListView):
+    logger.info("Client Main")
+    template_name = "client/client_main.html"
+    model = Medicine
+    form_class = MedicineSearchForm
+    filter_class = MedicineFilter
+    context_object_name = "medicines"
 
 
 class ClientCartView(View):
@@ -99,75 +113,51 @@ class ClientCartView(View):
         return redirect(request.path)
 
 
-class ApothecaryMainView(View):
-    def get(self, request):
-        pharmacies_without_orders = Pharmacy.objects.filter(apothecary__user_id=request.user.pk)
+class ApothecaryMainView(ListView):
+    logger.info("Apothecary Main")
+    model = Pharmacy
+    template_name = "apothecary/apothecary_main.html"
+    context_object_name = "pharmacies"
+
+    def get_queryset(self):
+        pharmacies_without_orders = Pharmacy.objects.filter(apothecary__user_id=self.request.user.pk)
         pharmacies = []
         for pharmacy in pharmacies_without_orders:
             count = Order.objects.filter(pharmacy_id=pharmacy.pk, status=ORDER_STATUS[1][0]).count()
             pharmacies.append((pharmacy, count))
-        return render(request, "apothecary/apothecary_main.html", {"pharmacies": pharmacies})
+        return pharmacies
 
 
-class AddPharmacyView(View):
-    def get(self, request):
-        pharmacy_form = PharmacyForm()
-        return render(request, "apothecary/add_pharmacy.html", {"pharmacy_form": pharmacy_form})
+class AddPharmacyView(CreateView):
+    logger.info("Add pharmacy")
+    template_name = "apothecary/add_pharmacy.html"
+    form_class = PharmacyForm
 
-    def post(self, request):
-        if not Apothecary.objects.filter(user_id=request.user.pk).exists():
-            messages.info(request, "You aren't apothecary")
-            return render(request, "apothecary/add_pharmacy.html", {"messages": messages})
-        with ThreadPoolExecutor() as executor:
-            pharmacy_thread = executor.submit(PharmacyForm, request.POST)
-
-            pharmacy_form = pharmacy_thread.result()
-
-        if pharmacy_form.is_valid():
-            Pharmacy.objects.create(name=pharmacy_form.cleaned_data.get('name', ''),
-                                    address=pharmacy_form.cleaned_data.get('address', ''),
-                                    apothecary_id=request.user.apothecary.pk)
-            return redirect('main')
-        else:
-            messages.info(request, "Incorrect data")
-            return render(request, "apothecary/add_pharmacy.html", {"messages": messages})
+    def form_valid(self, form):
+        pharmacy = form.save(commit=False)
+        pharmacy.apothecary = self.request.user.apothecary
+        pharmacy.save()
+        messages.info(self.request, "New pharmacy added successful")
+        return HttpResponseRedirect(reverse_lazy("main"))
 
 
+class MedicineView(DetailView):
+    logger.info("Medicine")
+    template_name = "medicine/medicine.html"
+    model = Medicine
+    context_object_name = "medicine"
+    pk_url_kwarg = "medicine_id"
+
+    def get_context_data(self, **kwargs):
+        context = super(MedicineView, self).get_context_data(**kwargs)
+        context['products'] = Product.objects.filter(medicine_id=self.kwargs["medicine_id"])
+        context['client_flag'] = Client.objects.filter(user_id=self.request.user.pk).exists()
+
+        return context
 
 
-class MedicineView(View):
-    def get(self, request, medicine_id):
-        medicine = Medicine.objects.get(pk=medicine_id)
-        products = Product.objects.filter(medicine_id=medicine_id)
-        client_flag = Client.objects.filter(user_id=request.user.pk).exists()
-        return render(request, "medicine/medicine.html",
-                      {"medicine": medicine, "products": products, "client_flag": client_flag})
-
-    def post(self, request, medicine_id):
-        if not Client.objects.filter(user_id=request.user.pk).exists():
-            messages.info(request, "You aren't client")
-            print(3)
-        else:
-            product_id = request.POST.get("product_id")
-            product = Product.objects.get(id=product_id)
-            with ThreadPoolExecutor() as executor:
-                order_thread = executor.submit(OrderForm, request.POST)
-
-                order_form = order_thread.result()
-
-            if order_form.is_valid():
-                amount = order_form.cleaned_data.get("amount")
-                price = amount * product.price
-                if product.amount > amount:
-                    Order.objects.create(amount=amount, price=price, client_id=request.user.client.pk,
-                                         pharmacy_id=product.pharmacy_id, product_id=product_id)
-                else:
-                    messages.info(request, "So many out of stock")
-            else:
-                messages.info(request, "Incorrect data")
-
-        return redirect(request.path)
-
+class MakeOrderView():
+    pass
 
 class PharmacyView(View):
     def get(self, request, pharmacy_id):

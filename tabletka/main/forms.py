@@ -70,3 +70,7 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ['phone', 'address']
+
+
+class MedicineSearchForm(forms.Form):
+    request = forms.CharField(required=False)

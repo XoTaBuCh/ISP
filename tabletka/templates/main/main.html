@@ -1,9 +1,12 @@
 {% extends "./../base.html" %}
 
 {% block nav-content %}
-    <form class="d-flex w-50" method="POST" action="">
+    <form class="d-flex w-50" method="GET" action="">
         {% csrf_token %}
-        <input name="request" class="form-control me-2" type="search" placeholder="Search Medicine" aria-label="Search">
+        {% for field in form %}
+            <input type="{{ field.widget_type }}" name="{{ field.name }}" class="form-control me-2"
+                   placeholder="Search Medicine" aria-label="Search">
+        {% endfor %}
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
 
@@ -19,7 +22,8 @@
                 <span class="text-white">Id</span>
                 <span class="text-white">Medicine</span>
                 <span class="text-white">Description</span>
-                <span class="text-white">Price range</span>
+                <span class="text-white">Type</span>
+
 
             </li>
         {% endif %}
@@ -29,7 +33,9 @@
                 <span>{{ medicine.id }}</span>
                 <a href="medicine/{{ medicine.id }}">{{ medicine.name }}</a>
                 <span>{{ medicine.description }}</span>
-                <span class="badge bg-primary rounded-pill">{{ medicine.min_price }} .. {{ medicine.max_price }}</span>
+                <span>{{ medicine.type }}</span>
+
+
             </li>
         {% endfor %}
 
