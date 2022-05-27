@@ -1,13 +1,11 @@
-from concurrent.futures import ThreadPoolExecutor
+import logging
+
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.views import PasswordChangeView, LoginView, LogoutView
+from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Max, Min
 from django.http import HttpResponseRedirect
-
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -16,10 +14,7 @@ from django.views.generic.edit import FormMixin
 from search_views.filters import BaseFilter
 from search_views.views import SearchListView
 
-from .models import *
-from django.contrib.auth import logout, login, authenticate
 from .forms import *
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -156,41 +151,90 @@ class MedicineView(DetailView):
         return context
 
 
-class MakeOrderView():
-    pass
+class MakeOrderView(DetailView, FormMixin):
+    logger.info("Make order")
+    template_name = "medicine/make_order.html"
+    form_class = OrderForm
+    model = Product
+    context_object_name = "product"
+    pk_url_kwarg = "product_id"
 
-class PharmacyView(View):
-    def get(self, request, pharmacy_id):
-        pharmacy = Pharmacy.objects.get(pk=pharmacy_id)
-        products = Product.objects.filter(pharmacy_id=pharmacy_id)
-        apothecary_flag = (request.user.pk == pharmacy.apothecary.user.pk)
+    success_url = reverse_lazy("shopping_cart")
 
-        return render(request, "pharmacy/pharmacy.html",
-                      {"pharmacy": pharmacy, "products": products, "apothecary_flag": apothecary_flag})
+    def get_context_data(self, **kwargs):
+        ctx = super(MakeOrderView, self).get_context_data(**kwargs)
+        ctx["form"] = self.get_form()
+        return ctx
 
-    def post(self, request, pharmacy_id):
-        if not Pharmacy.objects.filter(apothecary__user_id=request.user.pk).exists():
-            messages.info(request, "You aren't apothecary")
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
         else:
-            product_id = request.POST.get("product_id")
-            try:
-                product = Product.objects.get(id=product_id, pharmacy_id=pharmacy_id)
-                with ThreadPoolExecutor() as executor:
-                    product_thread = executor.submit(ProductForm, request.POST)
+            return self.form_invalid(form)
 
-                    product_form = product_thread.result()
+    def form_valid(self, form):
+        if form.cleaned_data.get("amount") > self.object.amount:
+            messages.info(self.request, "Out of stocks")
+            return super(MakeOrderView, self).form_invalid(form)
+        else:
+            order = form.save(commit=False)
+            order.status = ORDER_STATUS[0][0]
+            order.pharmacy = self.object.pharmacy
+            order.client = self.request.user.client
+            order.product = self.object
+            order.price = order.amount * self.object.price
+            order.save()
+            messages.info(self.request, "Added to cart")
+        return super(MakeOrderView, self).form_valid(form)
 
-                if product_form.is_valid():
-                    product.price = product_form.cleaned_data.get("price")
-                    product.amount = product_form.cleaned_data.get("amount")
-                    product.save()
-                else:
-                    messages.info(request, "Wrong data")
 
-            except ObjectDoesNotExist:
-                messages.info(request, "Product doesn't exists")
+class PharmacyView(DetailView):
+    logger.info("Pharmacy")
+    template_name = "pharmacy/pharmacy.html"
+    model = Pharmacy
+    context_object_name = "pharmacy"
+    pk_url_kwarg = "pharmacy_id"
 
-            return redirect(request.path)
+    def get_context_data(self, **kwargs):
+        context = super(PharmacyView, self).get_context_data(**kwargs)
+        context['products'] = Product.objects.filter(pharmacy_id=self.kwargs["pharmacy_id"])
+        context['apothecary_flag'] = Apothecary.objects.filter(user_id=self.request.user.pk).exists()
+
+        return context
+
+
+class PharmacyEditProductView(DetailView, FormMixin):
+    logger.info("Edit product")
+    template_name = "pharmacy/edit_product.html"
+    form_class = ProductForm
+    model = Product
+    context_object_name = "product"
+    pk_url_kwarg = "product_id"
+
+    def get_success_url(self):
+        return reverse_lazy("pharmacy", kwargs={'pharmacy_id': self.object.pharmacy.pk})
+
+    def get_context_data(self, **kwargs):
+        ctx = super(PharmacyEditProductView, self).get_context_data(**kwargs)
+        ctx["form"] = self.get_form()
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        self.object.amount = form.cleaned_data.get("amount")
+        self.object.price = form.cleaned_data.get("price")
+        self.object.save()
+        messages.info(self.request, "Edited")
+        return super(PharmacyEditProductView, self).form_valid(form)
 
 
 class PharmacyOrderView(View):

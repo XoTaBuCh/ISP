@@ -13,9 +13,10 @@ urlpatterns = [
     path('apothecary/add_pharmacy', AddPharmacyView.as_view(), name="add_pharmacy"),
 
     path('medicine/<int:medicine_id>/', MedicineView.as_view(), name="medicine"),
-    path('medicine/<int:medicine_id>/make_order', MakeOrderView.as_view(), name="make_order"),
+    path('medicine/<int:product_id>/make_order', MakeOrderView.as_view(), name="make_order"),
     path('pharmacy/<int:pharmacy_id>/', PharmacyView.as_view(), name="pharmacy"),
     path('pharmacy/<int:pharmacy_id>/orders', PharmacyOrderView.as_view(), name="pharmacy_order"),
-    path('pharmacy/<int:pharmacy_id>/add_product', PharmacyAddProductView.as_view(), name="pharmacy_add_product"),
+    path('pharmacy/<int:pharmacy_id>/add_product', PharmacyAddProductView.as_view(), name="add_product"),
+    path('pharmacy/<int:product_id>/edit_product', PharmacyEditProductView.as_view(), name="edit_product"),
 
 ]

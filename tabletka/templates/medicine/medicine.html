@@ -69,7 +69,7 @@
                 <span>{{ product.amount }}</span>
                 <span class="badge bg-primary rounded-pill">{{ product.price }}</span>
                 {% if client_flag %}
-                    <form class="d-grid gap-2" action="/medicine/{{ medicine.pk }}/make_order">
+                    <form class="d-grid gap-2" action="/medicine/{{ product.id }}/make_order">
                         <button class="btn btn-primary" type="submit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                  class="bi bi-check" viewBox="0 0 16 16">

@@ -9,60 +9,70 @@
 {% endblock %}
 
 {% block main-content %}
-    <form class="d-grid gap-2" method="POST" action="">
-        <table class="table w-50 mx-auto">
-            <thead>
-            <tr>
-                <th scope="col"> Info</th>
-                <th scope="col"></th>
-            </tr>
-            </thead>
-            <tbody class="table_borders">
-            <tr>
-                <td><img class="img-fluid"
-                         src="{% if product.medicine.image %}{{ product.medicine.image.url }}{% endif %}"></td>
+<form class="d-grid gap-2" method="POST" action="">
+    {% csrf_token %}
+    <table class="table w-50 mx-auto">
+        <thead>
+        <tr>
+            <th scope="col"> Info</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody class="table_borders">
+        <tr>
+            <td><img class="img-fluid"
+                     src="{% if product.medicine.image %}{{ product.medicine.image.url }}{% endif %}"></td>
 
-            </tr>
-            <tr>
-                <td><span> Id </span></td>
-                <td><span> {{ product.id }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Id </span></td>
+            <td><span> {{ product.id }}</span></td>
 
-            </tr>
-            <tr>
-                <td><span> Name </span></td>
-                <td><span>{{ product.medicine.name }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Description </span></td>
-                <td><span>{{ product.medicine.description }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Fabricator </span></td>
-                <td><span>{{ product.medicine.fabricator }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Type </span></td>
-                <td><span>{{ product.medicine.type }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Amount on stock </span></td>
-                <td><span>{{ product.amount }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Price </span></td>
-                <td><span>{{ product.price }}</span></td>
-            </tr>
-            <tr>
-                <td><span> Choose amount </span></td>
-                <td><span>{{ form }}</span></td>
-            </tr>
+        </tr>
+        <tr>
+            <td><span> Name </span></td>
+            <td><span>{{ product.medicine.name }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Description </span></td>
+            <td><span>{{ product.medicine.description }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Fabricator </span></td>
+            <td><span>{{ product.medicine.fabricator }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Type </span></td>
+            <td><span>{{ product.medicine.type }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Amount on stock </span></td>
+            <td><span>{{ product.amount }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Price </span></td>
+            <td><span>{{ product.price }}</span></td>
+        </tr>
+        <tr>
+            <td><span> Amount </span></td>
+            {% for field in form %}
+                <td><input type="{{ field.widget_type }}" name="{{ field.name }}" required class="form-control"
+                           value="{% if field.value != None %}{{ field.value }}{% endif %}">
+                {% for error in field.errors %}
+                <div class="alert alert-dismissible alert-danger mx-auto mt-1">
+                    {{ error|escape }}
+                </div>
+            {% endfor %}
+            </td>
+            {% endfor %}
+        </tr>
 
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-primary">
-            Add to cart
-        </button>
-    </form>
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary w-25 mx-auto">
+        Add to cart
+    </button>
+</form>
 
 
 {% endblock %}
