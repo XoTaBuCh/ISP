@@ -1,9 +1,9 @@
 from decimal import Decimal
 
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.contrib.auth.models import User
-from django.conf import settings
 from phonenumber_field.modelfields import PhoneNumberField
 
 MEDICINE_TYPES = [("PILLS", "PILLS"),
@@ -39,7 +39,7 @@ class Medicine(models.Model):
     fabricator = models.TextField("Fabricator", blank=True)
     type = models.CharField("Type", max_length=10, choices=MEDICINE_TYPES, default=MEDICINE_TYPES[0][0])
     date_created = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField("Image", blank=True, upload_to="medicines")
+    image = models.ImageField("Image", upload_to="medicines", default="medicines/images.jpeg")
 
 
 class Pharmacy(models.Model):

@@ -17,6 +17,8 @@ urlpatterns = [
     path('pharmacy/<int:pharmacy_id>/', PharmacyView.as_view(), name="pharmacy"),
     path('pharmacy/<int:pharmacy_id>/orders', PharmacyOrderView.as_view(), name="pharmacy_order"),
     path('pharmacy/<int:pharmacy_id>/add_product', PharmacyAddProductView.as_view(), name="add_product"),
+    path('pharmacy/<int:pharmacy_id>/add_existing_product', PharmacyAddExistingProductView.as_view(),
+         name="add_existing_product"),
     path('pharmacy/<int:product_id>/edit_product', PharmacyEditProductView.as_view(), name="edit_product"),
 
 ]
