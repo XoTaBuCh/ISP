@@ -15,7 +15,11 @@ from django.views.generic.edit import FormMixin
 from search_views.filters import BaseFilter
 from search_views.views import SearchListView
 
-from .forms import *
+from .constants import ORDER_STATUS_IN_CART, ORDER_STATUS_ACTIVE, ORDER_STATUS_DELETED, ORDER_STATUS_CANCELED, \
+    ORDER_STATUS_DONE
+from .forms import ClientForm, ApothecaryForm, MedicineForm, PharmacyForm, ProductForm, OrderForm, \
+    MedicineSearchForm
+from .models import Client, Apothecary, Medicine, Order, Product, Pharmacy
 
 logger = logging.getLogger(__name__)
 
@@ -71,10 +75,10 @@ class ClientCartView(View):
 
     def get(self, request):
         logger.info("Shopping cart GET")
-        orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS[0][0])
-        actives = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS[1][0])
+        orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS_IN_CART)
+        actives = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS_ACTIVE)
         history = Order.objects.filter(client__user_id=request.user.pk).exclude(
-            Q(status=ORDER_STATUS[0][0]) | Q(status=ORDER_STATUS[1][0]))
+            Q(status=ORDER_STATUS_IN_CART) | Q(status=ORDER_STATUS_ACTIVE))
 
         return render(request, "client/shopping_cart.html", {"orders": orders, "actives": actives, "history": history})
 
@@ -85,26 +89,36 @@ class ClientCartView(View):
             return redirect("main")
         else:
             if request.POST.get("flag") == "1":
-                orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS[0][0])
+                orders = Order.objects.filter(client__user_id=request.user.pk, status=ORDER_STATUS_IN_CART)
                 for order in orders:
                     try:
                         product = Product.objects.get(id=order.product.pk, amount__gte=order.amount)
                         product.amount -= order.amount
                         product.save()
-                        order.status = ORDER_STATUS[1][0]
+                        order.status = ORDER_STATUS_ACTIVE
                         order.save()
                     except ObjectDoesNotExist:
-                        order.status = ORDER_STATUS[3][0]
+                        order.status = ORDER_STATUS_CANCELED
                         order.save()
             elif request.POST.get("flag") == "2":
                 order_id = request.POST.get("order_id")
                 try:
                     order = Order.objects.get(client__user_id=request.user.pk, id=order_id)
-                    order.status = ORDER_STATUS[4][0]
+                    order.status = ORDER_STATUS_DELETED
                     order.save()
                 except ObjectDoesNotExist:
                     messages.info(request, "Order doesn't exists")
-
+            elif request.POST.get("flag") == "3":
+                order_id = request.POST.get("order_id")
+                try:
+                    order = Order.objects.get(client__user_id=request.user.pk, id=order_id)
+                    product = Product.objects.get(id=order.product.pk, amount__gte=order.amount)
+                    product.amount += order.amount
+                    product.save()
+                    order.status = ORDER_STATUS_DELETED
+                    order.save()
+                except ObjectDoesNotExist:
+                    messages.info(request, "Order doesn't exists")
         return redirect(request.path)
 
 
@@ -118,7 +132,7 @@ class ApothecaryMainView(ListView):
         pharmacies_without_orders = Pharmacy.objects.filter(apothecary__user_id=self.request.user.pk)
         pharmacies = []
         for pharmacy in pharmacies_without_orders:
-            count = Order.objects.filter(pharmacy_id=pharmacy.pk, status=ORDER_STATUS[1][0]).count()
+            count = Order.objects.filter(pharmacy_id=pharmacy.pk, status=ORDER_STATUS_ACTIVE).count()
             pharmacies.append((pharmacy, count))
         return pharmacies
 
@@ -180,7 +194,7 @@ class MakeOrderView(DetailView, FormMixin):
             return super(MakeOrderView, self).form_invalid(form)
         else:
             order = form.save(commit=False)
-            order.status = ORDER_STATUS[0][0]
+            order.status = ORDER_STATUS_IN_CART
             order.pharmacy = self.object.pharmacy
             order.client = self.request.user.client
             order.product = self.object
@@ -245,9 +259,9 @@ class PharmacyOrderView(ListView):
     pk_url_kwarg = "pharmacy_id"
 
     def get_queryset(self):
-        return Order.objects.filter(pharmacy_id=self.kwargs["pharmacy_id"], status=ORDER_STATUS[1][0])
+        return Order.objects.filter(pharmacy_id=self.kwargs["pharmacy_id"], status=ORDER_STATUS_ACTIVE)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         if not Pharmacy.objects.filter(apothecary__user_id=request.user.pk).exists():
             messages.info(request, "You aren't apothecary")
         else:
@@ -255,9 +269,9 @@ class PharmacyOrderView(ListView):
                 order_id = request.POST.get("order_id")
                 order = Order.objects.get(pharmacy_id=self.kwargs["pharmacy_id"], id=order_id)
                 if request.POST.get("flag") == "True":
-                    order.status = ORDER_STATUS[2][0]
+                    order.status = ORDER_STATUS_DONE
                 else:
-                    order.status = ORDER_STATUS[3][0]
+                    order.status = ORDER_STATUS_CANCELED
                 order.save()
             except ObjectDoesNotExist:
                 messages.info(request, "Order doesn't exists")
@@ -308,9 +322,17 @@ class PharmacyAddExistingProductView(CreateView):
 
     def form_valid(self, form):
         product = form.save(commit=False)
-        product.pharmacy = Pharmacy.objects.get(id=self.kwargs["pharmacy_id"])
-        product.medicine = Medicine.objects.get(id=self.request.POST.get("medicine_id"))
-        product.save()
+        if Product.objects.filter(pharmacy_id=self.kwargs["pharmacy_id"],
+                                  medicine_id=self.request.POST.get("medicine_id")).exists():
+            product_old = Product.objects.get(pharmacy_id=self.kwargs["pharmacy_id"],
+                                  medicine_id=self.request.POST.get("medicine_id"))
+            product_old.amount = product.amount
+            product_old.price = product.price
+            product_old.save()
+        else:
+            product.pharmacy = Pharmacy.objects.get(id=self.kwargs["pharmacy_id"])
+            product.medicine = Medicine.objects.get(id=self.request.POST.get("medicine_id"))
+            product.save()
         messages.info(self.request, "Product added")
         return HttpResponseRedirect(reverse_lazy("pharmacy", kwargs=self.kwargs))
 

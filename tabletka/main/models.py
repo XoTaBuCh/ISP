@@ -6,17 +6,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-MEDICINE_TYPES = [("PILLS", "PILLS"),
-                  ("CAPSULES", "CAPSULES"),
-                  ("POWDERS", "POWDERS"),
-                  ("SYRUP", "SYRUP"),
-                  ("MIXTURE", "MIXTURE"),
-                  ("OINTMENT", "OINTMENT")]
-ORDER_STATUS = [("IN CART", "IN CART"),
-                ("ACTIVE", "ACTIVE"),
-                ("DONE", "DONE"),
-                ("CANCELED", "CANCELED"),
-                ("DELETED", "DELETED")]
+from main.constants import *
 
 
 class Client(models.Model):
@@ -37,7 +27,7 @@ class Medicine(models.Model):
     name = models.CharField("Name", max_length=255)
     description = models.TextField("Description", blank=True)
     fabricator = models.TextField("Fabricator", blank=True)
-    type = models.CharField("Type", max_length=10, choices=MEDICINE_TYPES, default=MEDICINE_TYPES[0][0])
+    type = models.CharField("Type", max_length=10, choices=MEDICINE_TYPES, default=MEDICINE_TYPE_PILLS)
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField("Image", upload_to="medicines", default="medicines/images.jpeg")
 
@@ -60,7 +50,7 @@ class Order(models.Model):
     price = models.DecimalField("Price", max_digits=10, decimal_places=2,
                                 validators=[MinValueValidator(Decimal('0.01'))])
     amount = models.PositiveIntegerField("Amount", validators=[MinValueValidator(1)])
-    status = models.CharField("Status", max_length=10, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
+    status = models.CharField("Status", max_length=10, choices=ORDER_STATUSES, default=ORDER_STATUS_IN_CART)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

@@ -66,18 +66,22 @@
     <ul class="list-group mt-5 w-75 mx-auto">
         {% if medicines %}
             <li class="list-group-item d-flex justify-content-between align-items-center bg-primary">
-                <span class="text-white">Id</span>
                 <span class="text-white">Medicine</span>
                 <span class="text-white">Description</span>
+                <span class="text-white">Type</span>
+                <span class="text-white">Fabricator</span>
+
 
             </li>
         {% endif %}
 
         {% for medicine in medicines %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ medicine.id }}</span>
                 <a href="/medicine/{{ medicine.id }}">{{ medicine.name }}</a>
                 <span>{{ medicine.description }}</span>
+                <span>{{ medicine.type }}</span>
+                <span>{{ medicine.fabricator }}</span>
+
             </li>
         {% endfor %}
 

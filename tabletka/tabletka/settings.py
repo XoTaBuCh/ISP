@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
@@ -73,12 +73,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
-
-CORS_ORIGIN_WHITELIST = (
-    'https://localhost:3000',
-)
-
 ROOT_URLCONF = 'tabletka.urls'
 
 TEMPLATES = [
@@ -100,17 +94,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tabletka.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lab3',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
         'TEST': {
             'NAME': 'tester',
         },
@@ -196,3 +188,9 @@ LOGGING = {
 LOGIN_REDIRECT_URL = "main"
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = LOGIN_URL
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'tabletka.lab4@gmail.com'
+EMAIL_HOST_PASSWORD = 'sms5202031'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
