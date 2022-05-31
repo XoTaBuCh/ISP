@@ -9,7 +9,7 @@ from auth.tokens import account_activation_token
 
 def send_request_link(user, request):
     current_site = get_current_site(request)
-    subject = 'Activate your blog account.'
+    subject = 'Activate your tabletkas account.'
     message = render_to_string('auth/acc_active_email.html', {
         'user': user,
         'domain': current_site.domain,
